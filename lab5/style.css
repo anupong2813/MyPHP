@@ -1,0 +1,74 @@
+body {
+    font-family: 'Sarabun', sans-serif; /* 1. กำหนดฟอนต์ภาษาไทยให้อ่านง่าย */
+    background-color: #f4f6f9;          /* 2. สีพื้นหลังเทาอมฟ้า (ตามแบบอาจารย์) */
+    margin: 0;                          /* 3. ลบขอบขาวรอบจอที่ Browser แถมมาให้ออก */
+    
+    /* 4. ชุดคำสั่งจัดกึ่งกลาง (Flexbox) */
+    display: flex;                      
+    justify-content: center;            /* จัดกึ่งกลางแนวนอน (ซ้าย-ขวา) */
+    align-items: center;                /* จัดกึ่งกลางแนวตั้ง (บน-ล่าง) */
+    min-height: 100vh;                  /* บังคับให้ความสูงเต็มหน้าจอเสมอ */
+}
+.card {
+    background-color: white;      /* 1. พื้นหลังสีขาว */
+    width: 100%;                  /* 2. ความกว้าง 100% */
+    max-width: 400px;             /* 3. แต่กว้างสุดไม่เกิน 400px (จะได้ไม่ยืดจนน่าเกลียด) */
+    padding: 30px;                /* 4. ดันเนื้อหาห่างจากขอบเข้ามา 30px (ไม่ให้อึดอัด) */
+    border-radius: 10px;          /* 5. ลบเหลี่ยมมุม ให้โค้งมนสวยๆ */
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1); /* 6. ใส่เงาจางๆ ให้ดูมีมิติ (ลอยจากพื้น) */
+}
+h1 {
+    text-align: center;           /* จัดตัวหนังสือให้อยู่ตรงกลาง */
+    color: #1a56be;               /* เปลี่ยนสีเป็นน้ำเงินเข้ม */
+    margin-bottom: 25px;          /* เว้นระยะห่างด้านล่างไม่ให้ติดกับช่องกรอกข้อมูล */
+}
+
+label {
+    font-weight: bold;            /* ทำตัวหนา */
+    color: #333;                  /* สีดำเทา (อ่านสบายตากว่าดำสนิท) */
+    display: block;               /* สั่งให้ label กินพื้นที่เต็มบรรทัด (input จะได้ตกลงมาบรรทัดใหม่) */
+    margin-bottom: 5px;           /* เว้นช่องว่างนิดนึงก่อนถึงช่องกรอก */
+}
+/* เลือก input ที่เป็น text, tel และ email */
+input[type="text"], 
+input[type="tel"], 
+input[type="email"] {
+    width: 100%;                  /* 1. ขยายความกว้างให้เต็มกล่อง card */
+    padding: 10px;                /* 2. เพิ่มพื้นที่ภายในช่องกรอก ให้ตัวหนังสือไม่เบียดขอบ */
+    border: 1px solid #ddd;       /* 3. เส้นขอบสีเทาจางๆ */
+    border-radius: 5px;           /* 4. มุมโค้งมนเล็กน้อย */
+    margin-bottom: 15px;          /* 5. เว้นระยะห่างระหว่างแต่ละช่อง */
+    box-sizing: border-box;       /* 6. (สำคัญ) สั่งให้ padding ไม่ไปดันให้กล่องขยายเกิน 100% */
+}
+button, .btn {
+    width: 100%;                  /* ปุ่มกว้างเต็มบรรทัด */
+    padding: 12px;                /* ปุ่มหนาขึ้น กดง่าย */
+    background-color: #1a56be;    /* สีพื้นหลังน้ำเงิน (เหมือนหัวข้อ) */
+    color: white;                 /* ตัวหนังสือสีขาว */
+    border: none;                 /* ลบเส้นขอบนูนๆ แบบโบราณออก */
+    border-radius: 5px;           /* มุมโค้ง */
+    cursor: pointer;              /* เวลาเอาเมาส์ชี้ ให้เปลี่ยนเป็นรูปมือ */
+    font-size: 16px;              /* ตัวหนังสือใหญ่ขึ้น */
+    
+    /* สำหรับปุ่ม "กลับไปกรอกใหม่" ที่เป็น Link <a> */
+    display: block;               
+    text-align: center;
+    text-decoration: none;        /* ลบขีดเส้นใต้ link ออก */
+    box-sizing: border-box;
+}
+
+button:hover, .btn:hover {
+    background-color: #144296;    /* ลูกเล่น: พอเอาเมาส์ชี้ ให้เปลี่ยนเป็นสีเข้มขึ้นนิดนึง */
+}
+.info-item {
+    margin-bottom: 15px;          /* เว้นระยะแต่ละก้อนข้อมูล */
+}
+
+.value {
+    background-color: #f8f9fa;    /* พื้นหลังสีเทาอ่อนมากๆ */
+    padding: 10px;                /* เว้นระยะข้างใน */
+    border: 1px solid #eee;       /* เส้นขอบจางๆ */
+    border-radius: 5px;           /* มุมโค้ง */
+    color: #333;                  /* สีตัวอักษร */
+    font-weight: bold;            /* ตัวหนาเพื่อให้ข้อมูลเด่นชัด */
+}
