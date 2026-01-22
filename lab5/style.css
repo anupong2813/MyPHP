@@ -1,74 +1,127 @@
 body {
-    font-family: 'Sarabun', sans-serif; /* 1. กำหนดฟอนต์ภาษาไทยให้อ่านง่าย */
-    background-color: #f4f6f9;          /* 2. สีพื้นหลังเทาอมฟ้า (ตามแบบอาจารย์) */
-    margin: 0;                          /* 3. ลบขอบขาวรอบจอที่ Browser แถมมาให้ออก */
+    font-family: sans-serif; /* ฟอนต์ปกติ */
     
-    /* 4. ชุดคำสั่งจัดกึ่งกลาง (Flexbox) */
-    display: flex;                      
-    justify-content: center;            /* จัดกึ่งกลางแนวนอน (ซ้าย-ขวา) */
-    align-items: center;                /* จัดกึ่งกลางแนวตั้ง (บน-ล่าง) */
-    min-height: 100vh;                  /* บังคับให้ความสูงเต็มหน้าจอเสมอ */
+    /* 1. พื้นหลังสีเทา (ตามรหัสสีจากรูป #A0ABB1) */
+    background-color: #A0ABB1;
+    
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
 }
+
+/* กล่องสีขาวตรงกลาง (Card) */
 .card {
-    background-color: white;      /* 1. พื้นหลังสีขาว */
-    width: 100%;                  /* 2. ความกว้าง 100% */
-    max-width: 400px;             /* 3. แต่กว้างสุดไม่เกิน 400px (จะได้ไม่ยืดจนน่าเกลียด) */
-    padding: 30px;                /* 4. ดันเนื้อหาห่างจากขอบเข้ามา 30px (ไม่ให้อึดอัด) */
-    border-radius: 10px;          /* 5. ลบเหลี่ยมมุม ให้โค้งมนสวยๆ */
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1); /* 6. ใส่เงาจางๆ ให้ดูมีมิติ (ลอยจากพื้น) */
+    background-color: white;
+    width: 100%;
+    max-width: 400px;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15); /* เงาเข้มขึ้นนิดนึงเพื่อให้ตัดกับพื้นหลังเทา */
 }
+
+/* 2. หัวข้อและตัวหนังสือ (สีน้ำเงินเข้ม) */
 h1 {
-    text-align: center;           /* จัดตัวหนังสือให้อยู่ตรงกลาง */
-    color: #1a56be;               /* เปลี่ยนสีเป็นน้ำเงินเข้ม */
-    margin-bottom: 25px;          /* เว้นระยะห่างด้านล่างไม่ให้ติดกับช่องกรอกข้อมูล */
+    text-align: center;
+    color: #1a4f7a; /* สีน้ำเงินเข้ม */
+    margin-bottom: 25px;
 }
 
 label {
-    font-weight: bold;            /* ทำตัวหนา */
-    color: #333;                  /* สีดำเทา (อ่านสบายตากว่าดำสนิท) */
-    display: block;               /* สั่งให้ label กินพื้นที่เต็มบรรทัด (input จะได้ตกลงมาบรรทัดใหม่) */
-    margin-bottom: 5px;           /* เว้นช่องว่างนิดนึงก่อนถึงช่องกรอก */
+    display: block;
+    margin-bottom: 5px;
+    color: #1a4f7a; /* สีน้ำเงินเข้ม (เหมือนหัวข้อ) */
+    font-weight: bold;
 }
-/* เลือก input ที่เป็น text, tel และ email */
-input[type="text"], 
-input[type="tel"], 
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+/* 3. กล่องข้อความ (สีฟ้าตามรูป #98B6D7) */
+input[type="text"],
+input[type="tel"],
 input[type="email"] {
-    width: 100%;                  /* 1. ขยายความกว้างให้เต็มกล่อง card */
-    padding: 10px;                /* 2. เพิ่มพื้นที่ภายในช่องกรอก ให้ตัวหนังสือไม่เบียดขอบ */
-    border: 1px solid #ddd;       /* 3. เส้นขอบสีเทาจางๆ */
-    border-radius: 5px;           /* 4. มุมโค้งมนเล็กน้อย */
-    margin-bottom: 15px;          /* 5. เว้นระยะห่างระหว่างแต่ละช่อง */
-    box-sizing: border-box;       /* 6. (สำคัญ) สั่งให้ padding ไม่ไปดันให้กล่องขยายเกิน 100% */
-}
-button, .btn {
-    width: 100%;                  /* ปุ่มกว้างเต็มบรรทัด */
-    padding: 12px;                /* ปุ่มหนาขึ้น กดง่าย */
-    background-color: #1a56be;    /* สีพื้นหลังน้ำเงิน (เหมือนหัวข้อ) */
-    color: white;                 /* ตัวหนังสือสีขาว */
-    border: none;                 /* ลบเส้นขอบนูนๆ แบบโบราณออก */
-    border-radius: 5px;           /* มุมโค้ง */
-    cursor: pointer;              /* เวลาเอาเมาส์ชี้ ให้เปลี่ยนเป็นรูปมือ */
-    font-size: 16px;              /* ตัวหนังสือใหญ่ขึ้น */
+    width: 100%;
+    padding: 12px;
     
-    /* สำหรับปุ่ม "กลับไปกรอกใหม่" ที่เป็น Link <a> */
-    display: block;               
-    text-align: center;
-    text-decoration: none;        /* ลบขีดเส้นใต้ link ออก */
+    /* พื้นหลังกล่องข้อความสีฟ้า */
+    background-color: #98B6D7; 
+    
+    border: 2px solid transparent; /* ซ่อนขอบเดิม */
+    border-radius: 8px;
     box-sizing: border-box;
+    
+    /* ตัวหนังสือที่พิมพ์ลงไปเป็นสีน้ำเงินเข้ม จะได้อ่านง่าย */
+    color: #0e3b5e; 
+    font-weight: bold;
 }
 
+/* ตอนคลิกกล่องข้อความ */
+input:focus {
+    outline: none;
+    background-color: #e3f2fd; /* เปลี่ยนเป็นสีฟ้าจางๆ ตอนพิมพ์จะได้สบายตา */
+    border-color: #1a4f7a;
+}
+
+/* เปลี่ยนสี Placeholder (ตัวหนังสือจางๆ คำว่า "กรอกรหัส") ให้เข้มขึ้นนิดนึงจะได้อ่านออกบนพื้นหลังฟ้า */
+::placeholder {
+    color: #4a6b8a;
+    opacity: 1;
+}
+
+/* 4. ปุ่มกด (สีเทาตามรูป #A0ABB1) */
+button, .btn {
+    width: 100%;
+    padding: 12px;
+    
+    /* สีปุ่มเป็นสีเทา */
+    background-color: #A0ABB1;
+    
+    /* ตัวหนังสือบนปุ่มสีน้ำเงินเข้ม */
+    color: #1a4f7a; 
+    
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 15px;
+    display: block;
+    text-align: center;
+    text-decoration: none;
+    box-sizing: border-box;
+    transition: all 0.2s;
+}
+
+/* ตอนเอาเมาส์ชี้ปุ่ม */
 button:hover, .btn:hover {
-    background-color: #144296;    /* ลูกเล่น: พอเอาเมาส์ชี้ ให้เปลี่ยนเป็นสีเข้มขึ้นนิดนึง */
-}
-.info-item {
-    margin-bottom: 15px;          /* เว้นระยะแต่ละก้อนข้อมูล */
+    background-color: #7d8b92; /* เปลี่ยนเป็นสีเทาเข้มขึ้น */
+    color: white; /* ตัวหนังสือเปลี่ยนเป็นขาว */
 }
 
-.value {
-    background-color: #f8f9fa;    /* พื้นหลังสีเทาอ่อนมากๆ */
-    padding: 10px;                /* เว้นระยะข้างใน */
-    border: 1px solid #eee;       /* เส้นขอบจางๆ */
-    border-radius: 5px;           /* มุมโค้ง */
-    color: #333;                  /* สีตัวอักษร */
-    font-weight: bold;            /* ตัวหนาเพื่อให้ข้อมูลเด่นชัด */
+/* --- ส่วนหน้า Result --- */
+.info-item {
+    margin-bottom: 15px;
+    border-bottom: 1px solid #A0ABB1; /* เส้นคั่นสีเทา */
+    padding-bottom: 10px;
+}
+
+.info-item .label {
+    font-weight: normal;
+    color: #555;
+    font-size: 14px;
+}
+
+.info-item .value {
+    font-size: 18px;
+    color: #1a4f7a; /* ค่าข้อมูลเป็นสีน้ำเงินเข้ม */
+    font-weight: bold;
+    
+    /* เพิ่มลูกเล่น: ใส่พื้นหลังสีฟ้าที่ข้อมูลด้วย */
+    background-color: #98B6D7;
+    padding: 8px;
+    border-radius: 5px;
+    margin-top: 5px;
 }
