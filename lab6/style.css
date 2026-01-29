@@ -1,0 +1,81 @@
+/* ตั้งค่าสีและฟอนต์ธีมเขียวสุขภาพ */
+:root {
+    --primary-green: #4CAF50;
+    --dark-green: #2E7D32;
+    --bg-light: #f1f8e9;
+    --white: #ffffff;
+}
+
+body {
+    font-family: 'Prompt', sans-serif;
+    background-color: var(--bg-light);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+}
+
+.container {
+    background: var(--white);
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    width: 100%;
+    max-width: 500px;
+}
+
+h1 {
+    color: var(--dark-green);
+    text-align: center;
+    font-size: 24px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+    color: var(--dark-green);
+    font-weight: 500;
+}
+
+.form-control {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-sizing: border-box;
+}
+
+.form-control:focus {
+    border-color: var(--primary-green);
+    outline: none;
+}
+
+.btn-primary {
+    background: var(--primary-green);
+    color: white;
+    border: none;
+    padding: 12px;
+    width: 100%;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    margin-top: 10px;
+}
+
+.btn-primary:hover {
+    background: var(--dark-green);
+}
+
+.btn-cancel {
+    display: block;
+    text-align: center;
+    margin-top: 10px;
+    color: #888;
+    text-decoration: none;
+    font-size: 14px;
+}
