@@ -1,76 +1,53 @@
 <?php
-// list.php
 require __DIR__ . '/config.php';
-
-// Fetch products
-$sql = "SELECT id, productname, detail, price, img FROM Nindam_Products ORDER BY id DESC";
+// ดึงข้อมูลจากตาราง products (ตรงตามที่อยู่ใน phpMyAdmin ของคุณ)
+$sql = "SELECT id, productname, detail, price, img FROM products ORDER BY id DESC";
 $stmt = $pdo->query($sql);
 $products = $stmt->fetchAll();
 ?>
 <!doctype html>
-<html lang="en">
+<html lang="th">
 <head>
-<meta charset="utf-8">
-<title>Product List</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<style>
-body { font-family: system-ui, Arial, sans-serif; padding: 24px; }
-.container { max-width: 1000px; margin: auto; }
-table { width: 100%; border-collapse: collapse; margin-top: 16px; }
-th, td { border: 1px solid #ddd; padding: 10px; vertical-align: top; }
-th { background: #f5f5f5; text-align: left; }
-img { max-width: 120px; height: auto; border-radius: 6px; }
-.price { text-align: right; }
-.actions a { margin-right: 8px; text-decoration: none; color: #0d6efd; }
-</style>
+    <meta charset="utf-8">
+    <title>My Vinyl Collection</title>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        body { background-color: #0a0a0c; color: #fff; font-family: 'Kanit', sans-serif; padding: 40px; margin: 0; }
+        .header { display: flex; justify-content: space-between; align-items: center; max-width: 1100px; margin: 0 auto 40px; }
+        h1 { font-weight: 600; background: linear-gradient(to right, #bc13fe, #fe13bc); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .btn-add { background: #bc13fe; color: white; text-decoration: none; padding: 10px 20px; border-radius: 12px; font-weight: 600; transition: 0.3s; }
+        .btn-add:hover { box-shadow: 0 0 15px #bc13fe; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 30px; max-width: 1100px; margin: auto; }
+        .card { background: #16161a; border-radius: 20px; overflow: hidden; border: 1px solid #222; transition: 0.3s; }
+        .card:hover { transform: translateY(-10px); border-color: #bc13fe; }
+        .card img { width: 100%; aspect-ratio: 1/1; object-fit: cover; }
+        .card-content { padding: 20px; }
+        .card-name { font-weight: 600; font-size: 18px; margin-bottom: 5px; }
+        .card-detail { color: #888; font-size: 14px; margin-bottom: 15px; }
+        .card-price { color: #bc13fe; font-weight: 600; font-size: 20px; }
+    </style>
 </head>
 <body>
-
-<div class="container">
-<h1>All Products</h1>
-
-<p>
-  <a href="create.php">➕ Add New Product</a>
-</p>
-
-<?php if (!$products): ?>
-  <p><em>No products found.</em></p>
-<?php else: ?>
-<table>
-  <thead>
-    <tr>
-      <th>ID</th>
-      <th>Image</th>
-      <th>Product Name</th>
-      <th>Detail</th>
-      <th class="price">Price</th>
-    </tr>
-  </thead>
-  <tbody>
-    <?php foreach ($products as $p): ?>
-      <tr>
-        <td><?= htmlspecialchars($p['id']) ?></td>
-        <td>
-          <?php if (!empty($p['img'])): ?>
-            <?php if (preg_match('~^https?://~i', $p['img'])): ?>
-              <img src="<?= htmlspecialchars($p['img']) ?>" alt="">
-            <?php else: ?>
-              <img src="<?= htmlspecialchars($p['img']) ?>" alt="">
-            <?php endif; ?>
-          <?php else: ?>
-            <em>No image</em>
-          <?php endif; ?>
-        </td>
-        <td><?= htmlspecialchars($p['productname']) ?></td>
-        <td><?= nl2br(htmlspecialchars($p['detail'])) ?></td>
-        <td class="price"><?= number_format($p['price'], 2) ?></td>
-      </tr>
-    <?php endforeach; ?>
-  </tbody>
-</table>
-<?php endif; ?>
-
+<div class="header">
+    <h1>COLLECTION 💿</h1>
+    <a href="index.php" class="btn-add">+ ADD NEW VIBE</a>
 </div>
 
+<div class="grid">
+    <?php foreach ($products as $p): ?>
+    <div class="card">
+        <?php if ($p['img']): ?>
+            <img src="<?= htmlspecialchars($p['img']) ?>" alt="cover">
+        <?php else: ?>
+            <div style="aspect-ratio: 1/1; background: #333; display: flex; align-items: center; justify-content: center;">No Cover</div>
+        <?php endif; ?>
+        <div class="card-content">
+            <div class="card-name"><?= htmlspecialchars($p['productname']) ?></div>
+            <div class="card-detail"><?= nl2br(htmlspecialchars($p['detail'])) ?></div>
+            <div class="card-price">฿<?= number_format($p['price'], 2) ?></div>
+        </div>
+    </div>
+    <?php endforeach; ?>
+</div>
 </body>
 </html>

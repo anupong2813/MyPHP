@@ -1,40 +1,54 @@
-<!DOCTYPE html>
+<?php
+session_start();
+require __DIR__ . '/csrf.php';
+$sticky = $_SESSION['sticky'] ?? [];
+unset($_SESSION['sticky']);
+function e($v) { return htmlspecialchars($v ?? '', ENT_QUOTES, 'UTF-8'); }
+?>
+<!doctype html>
 <html lang="th">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>เพิ่มเมนูเครื่องดื่มสุขภาพ</title>
-    <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;700&display=swap" rel="stylesheet">
+    <meta charset="utf-8">
+    <title>Vinyl Station - Add New Beat</title>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root { --primary: #bc13fe; --bg: #0a0a0c; --card: #16161a; }
+        body { background-color: var(--bg); color: #fff; font-family: 'Kanit', sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+        .container { background: var(--card); padding: 40px; border-radius: 24px; box-shadow: 0 0 20px rgba(188, 19, 254, 0.2); width: 100%; max-width: 450px; border: 1px solid #222; }
+        h1 { text-align: center; font-weight: 600; font-size: 28px; margin-bottom: 30px; background: linear-gradient(to right, #bc13fe, #fe13bc); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        label { display: block; margin-bottom: 8px; font-size: 14px; color: #aaa; }
+        input, textarea { width: 100%; padding: 12px; margin-bottom: 20px; background: #222; border: 1px solid #333; border-radius: 12px; color: #fff; font-size: 16px; box-sizing: border-box; transition: 0.3s; }
+        input:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 10px rgba(188, 19, 254, 0.3); }
+        button { width: 100%; padding: 15px; background: var(--primary); color: white; border: none; border-radius: 12px; font-size: 18px; font-weight: 600; cursor: pointer; transition: 0.3s; margin-top: 10px; }
+        button:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(188, 19, 254, 0.4); }
+        .footer-link { text-align: center; margin-top: 20px; font-size: 14px; }
+        .footer-link a { color: #888; text-decoration: none; transition: 0.3s; }
+        .footer-link a:hover { color: var(--primary); }
+    </style>
 </head>
 <body>
-    <div class="container">
-        <h2>🍊 เพิ่มเมนูเครื่องดื่มสุขภาพ 🍏</h2>
+<div class="container">
+    <h1>💿 VINYL STATION</h1>
+    <form method="POST" action="create_pre.php" enctype="multipart/form-data">
+        <input type="hidden" name="csrf_token" value="<?= e($_SESSION['csrf_token']) ?>">
         
-        <form method="POST" action="create.php" enctype="multipart/form-data">
-            <div class="form-group">
-                <label for="productname">Product Name *</label>
-                <input type="text" id="productname" name="productname" class="form-control" placeholder="ชื่อเมนู เช่น สมูตตี้เบอร์รี่" required>
-            </div>
+        <label>Artist & Album Name</label>
+        <input type="text" name="productname" placeholder="เช่น NewJeans - Get Up" value="<?= e($sticky['productname'] ?? '') ?>" required>
 
-            <div class="form-group">
-                <label for="detail">Product Detail *</label>
-                <textarea id="detail" name="detail" class="form-control" rows="3" placeholder="รายละเอียดวัตถุดิบ..." required></textarea>
-            </div>
+        <label>Genre (Pop, K-Pop, Disco)</label>
+        <input type="text" name="detail" placeholder="ระบุแนวเพลงหรือสภาพแผ่น..." value="<?= e($sticky['detail'] ?? '') ?>" required>
 
-            <div class="form-group">
-                <label for="price">Price *</label>
-                <input type="number" id="price" name="price" class="form-control" step="0.01" placeholder="0.00" required>
-            </div>
+        <label>Price (THB)</label>
+        <input type="number" step="0.01" name="price" placeholder="0.00" value="<?= e($sticky['price'] ?? '') ?>" required>
 
-            <div class="form-group">
-                <label for="img_upload">📸 Upload Image</label>
-                <input type="file" id="img_upload" name="img_upload" accept="image/*" class="form-control">
-            </div>
-
-            <button type="submit" class="btn-primary">Create Product</button>
-            <a href="dashboard.php" class="btn-outline">View All Menus</a>
-        </form>
+        <label>Album Cover Image</label>
+        <input type="file" name="img_upload" accept="image/*">
+        
+        <button type="submit">DROP IT! (Preview)</button>
+    </form>
+    <div class="footer-link">
+        <a href="list.php">← Back to Collection</a>
     </div>
+</div>
 </body>
 </html>

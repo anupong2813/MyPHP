@@ -1,10 +1,9 @@
--- สร้างตารางใหม่สำหรับน้ำผลไม้
-CREATE TABLE `Juice_Products` (
+-- สร้างตารางสำหรับเก็บข้อมูลแผ่นเสียง Vinyl
+CREATE TABLE `products` (
   `id` int NOT NULL AUTO_INCREMENT,
-  `product_name` varchar(255) NOT NULL, -- ชื่อน้ำผลไม้
-  `description` text NOT NULL,         -- สรรพคุณ/รายละเอียด
-  `price` decimal(10,2) NOT NULL,      -- ราคา
-  `category` varchar(100) DEFAULT NULL, -- หมวดหมู่ เช่น Cold-Pressed, Smoothie
-  `image_path` varchar(500) DEFAULT NULL,
+  `productname` varchar(255) NOT NULL, -- ชื่อศิลปิน และ ชื่ออัลบั้ม
+  `detail` text NOT NULL,              -- แนวเพลง (Pop, K-Pop, Disco) และรายละเอียดแผ่น
+  `price` decimal(10,2) NOT NULL,      -- ราคาแผ่นเสียง
+  `img` varchar(500) DEFAULT NULL,     -- ที่อยู่ไฟล์รูปภาพหน้าปก
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
