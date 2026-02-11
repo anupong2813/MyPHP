@@ -14,7 +14,16 @@ $products = $stmt->fetchAll();
     <style>
         body { background-color: #0a0a0c; color: #fff; font-family: 'Kanit', sans-serif; padding: 40px; margin: 0; }
         .header { display: flex; justify-content: space-between; align-items: center; max-width: 1100px; margin: 0 auto 40px; }
-        h1 { font-weight: 600; background: linear-gradient(to right, #bc13fe, #fe13bc); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        
+        /* แก้ไขจุดที่ VS Code แจ้งเตือนเรื่อง compatibility ตรงนี้ครับ */
+        h1 { 
+            font-weight: 600; 
+            background: linear-gradient(to right, #bc13fe, #fe13bc); 
+            -webkit-background-clip: text; /* สำหรับเบราว์เซอร์ตระกูล Webkit */
+            background-clip: text;         /* เพิ่มบรรทัดนี้ตามที่ VS Code เตือน */
+            -webkit-text-fill-color: transparent; 
+        }
+
         .btn-add { background: #bc13fe; color: white; text-decoration: none; padding: 10px 20px; border-radius: 12px; font-weight: 600; transition: 0.3s; }
         .btn-add:hover { box-shadow: 0 0 15px #bc13fe; }
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 30px; max-width: 1100px; margin: auto; }
@@ -36,15 +45,15 @@ $products = $stmt->fetchAll();
 <div class="grid">
     <?php foreach ($products as $p): ?>
     <div class="card">
-        <?php if ($p['img']): ?>
+        <?php if (!empty($p['img'])): ?>
             <img src="<?= htmlspecialchars($p['img']) ?>" alt="cover">
         <?php else: ?>
-            <div style="aspect-ratio: 1/1; background: #333; display: flex; align-items: center; justify-content: center;">No Cover</div>
+            <div style="aspect-ratio: 1/1; background: #333; display: flex; align-items: center; justify-content: center; font-size: 14px; color: #666;">No Cover</div>
         <?php endif; ?>
         <div class="card-content">
-            <div class="card-name"><?= htmlspecialchars($p['productname']) ?></div>
-            <div class="card-detail"><?= nl2br(htmlspecialchars($p['detail'])) ?></div>
-            <div class="card-price">฿<?= number_format($p['price'], 2) ?></div>
+            <div class="card-name"><?= htmlspecialchars($p['productname'] ?? 'Unknown Artist') ?></div>
+            <div class="card-detail"><?= nl2br(htmlspecialchars($p['detail'] ?? '')) ?></div>
+            <div class="card-price">฿<?= number_format($p['price'] ?? 0, 2) ?></div>
         </div>
     </div>
     <?php endforeach; ?>

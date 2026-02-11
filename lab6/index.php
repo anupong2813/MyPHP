@@ -1,8 +1,15 @@
 <?php
 session_start();
 require __DIR__ . '/csrf.php';
+
+// ตรวจสอบว่ามี token หรือยัง ถ้าไม่มีให้สร้างใหม่ (ฟังก์ชันนี้ควรอยู่ใน csrf.php ของคุณ)
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+
 $sticky = $_SESSION['sticky'] ?? [];
 unset($_SESSION['sticky']);
+
 function e($v) { return htmlspecialchars($v ?? '', ENT_QUOTES, 'UTF-8'); }
 ?>
 <!doctype html>
@@ -15,7 +22,19 @@ function e($v) { return htmlspecialchars($v ?? '', ENT_QUOTES, 'UTF-8'); }
         :root { --primary: #bc13fe; --bg: #0a0a0c; --card: #16161a; }
         body { background-color: var(--bg); color: #fff; font-family: 'Kanit', sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
         .container { background: var(--card); padding: 40px; border-radius: 24px; box-shadow: 0 0 20px rgba(188, 19, 254, 0.2); width: 100%; max-width: 450px; border: 1px solid #222; }
-        h1 { text-align: center; font-weight: 600; font-size: 28px; margin-bottom: 30px; background: linear-gradient(to right, #bc13fe, #fe13bc); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        
+        /* แก้ไขจุดที่ VS Code แจ้งเตือนตรงนี้ครับ */
+        h1 { 
+            text-align: center; 
+            font-weight: 600; 
+            font-size: 28px; 
+            margin-bottom: 30px; 
+            background: linear-gradient(to right, #bc13fe, #fe13bc); 
+            -webkit-background-clip: text; /* สำหรับ Chrome/Safari */
+            background-clip: text;         /* ค่ามาตรฐานที่ VS Code แนะนำให้ใส่ */
+            -webkit-text-fill-color: transparent; 
+        }
+
         label { display: block; margin-bottom: 8px; font-size: 14px; color: #aaa; }
         input, textarea { width: 100%; padding: 12px; margin-bottom: 20px; background: #222; border: 1px solid #333; border-radius: 12px; color: #fff; font-size: 16px; box-sizing: border-box; transition: 0.3s; }
         input:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 10px rgba(188, 19, 254, 0.3); }
@@ -30,7 +49,7 @@ function e($v) { return htmlspecialchars($v ?? '', ENT_QUOTES, 'UTF-8'); }
 <div class="container">
     <h1>💿 VINYL STATION</h1>
     <form method="POST" action="create_pre.php" enctype="multipart/form-data">
-        <input type="hidden" name="csrf_token" value="<?= e($_SESSION['csrf_token']) ?>">
+        <input type="hidden" name="csrf_token" value="<?= e($_SESSION['csrf_token'] ?? '') ?>">
         
         <label>Artist & Album Name</label>
         <input type="text" name="productname" placeholder="เช่น NewJeans - Get Up" value="<?= e($sticky['productname'] ?? '') ?>" required>
