@@ -1,4 +1,5 @@
 <?php
+// create_pre.php
 session_start();
 require __DIR__ . '/csrf.php';
 
@@ -19,9 +20,10 @@ $img_url     = trim($_POST['img_url'] ?? '');
 
 $errors = [];
 
-// ปรับข้อความแจ้งเตือนให้เข้ากับแผ่นเสียง
+// ตรวจสอบข้อมูลเบื้องต้น
 if ($productname === '') $errors[] = 'กรุณาระบุชื่อศิลปินหรือชื่ออัลบั้ม';
-if ($detail === '')      $errors[] = 'กรุณาระบุแนวเพลงหรือรายละเอียดแผ่นเสียง';
+// แก้ไขข้อความแจ้งเตือน Error ให้เป็น "รายละเอียดแผ่นเสียง"
+if ($detail === '')      $errors[] = 'กรุณาระบุรายละเอียดแผ่นเสียง';
 if ($price === '' || !is_numeric($price) || $price <= 0)
     $errors[] = 'กรุณาระบุราคาที่ถูกต้อง';
 
@@ -38,13 +40,21 @@ if (!empty($_FILES['img_upload']['tmp_name'])) {
 
     if (!$errors) {
         $tmpDir = __DIR__.'/temp';
-        if (!is_dir($tmpDir)) mkdir($tmpDir,0777,true);
+        
+        // ตรวจสอบและสร้างโฟลเดอร์ temp พร้อมบังคับสิทธิ์ 0777
+        if (!is_dir($tmpDir)) {
+            @mkdir($tmpDir, 0777, true);
+        }
+        @chmod($tmpDir, 0777); 
 
         $name = 'pre_'.bin2hex(random_bytes(10)).'.'.$extMap[$info['mime']];
-        move_uploaded_file($_FILES['img_upload']['tmp_name'], "$tmpDir/$name");
-
-        $preview_img = "temp/$name";
-        $source = 'upload';
+        
+        if (move_uploaded_file($_FILES['img_upload']['tmp_name'], "$tmpDir/$name")) {
+            $preview_img = "temp/$name";
+            $source = 'upload';
+        } else {
+            $errors[] = 'ไม่สามารถย้ายไฟล์ไปยังโฟลเดอร์พักได้ (ตรวจสอบ Permission ของโฟลเดอร์ temp)';
+        }
     }
 }
 
@@ -54,53 +64,54 @@ if (!$preview_img && filter_var($img_url, FILTER_VALIDATE_URL)) {
     $source = 'url';
 }
 
-// ถ้ามีข้อผิดพลาด ส่งกลับไปหน้าฟอร์ม (แนะนำให้เปลี่ยนเป็น index.php ถ้าคุณเปลี่ยนชื่อไฟล์แล้ว)
+// หากมีข้อผิดพลาด ส่งกลับไปหน้าฟอร์ม
 if ($errors) {
     $_SESSION['sticky'] = compact('productname','detail','price','img_url');
     die('<h3>พบข้อผิดพลาด</h3><ul><li>'.implode('</li><li>',$errors).'</li></ul><a href="index.php">ย้อนกลับไปแก้ไข</a>');
 }
 
-/* เก็บค่าลง Session เพื่อส่งไปบันทึก */
+/* เก็บค่าลง Session เพื่อส่งไปหน้าบันทึก */
 $_SESSION['preview'] = compact(
     'productname','detail','price','preview_img','source'
 );
 ?>
+
 <!doctype html>
 <html lang="th">
 <head>
     <meta charset="utf-8">
-    <title>ตรวจสอบข้อมูลแผ่นเสียง</title>
+    <title>Preview: ตรวจสอบข้อมูลแผ่นเสียง</title>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'system-ui', sans-serif; background-color: #f8f9fa; padding: 40px; }
-        .preview-card { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); max-width: 500px; margin: auto; }
-        h2 { color: #333; border-bottom: 2px solid #eee; padding-bottom: 10px; }
-        .label { font-weight: bold; color: #666; }
-        img { border-radius: 10px; margin: 15px 0; border: 1px solid #ddd; }
-        .btn-group { margin-top: 25px; }
-        .btn-save { background: #333; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; }
-        .btn-back { color: #666; text-decoration: none; margin-left: 15px; font-size: 14px; }
+        body { background-color: #0a0a0c; color: #fff; font-family: 'Kanit', sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+        .container { background: #16161a; padding: 40px; border-radius: 25px; border: 1px solid #222; width: 100%; max-width: 450px; text-align: center; }
+        h2 { color: #bc13fe; margin-bottom: 20px; }
+        .preview-info { text-align: left; background: #0a0a0c; padding: 20px; border-radius: 15px; margin-bottom: 20px; border: 1px solid #333; }
+        img { max-width: 100%; border-radius: 15px; margin-top: 10px; border: 1px solid #bc13fe; }
+        .btn-confirm { background: #bc13fe; color: white; border: none; width: 100%; padding: 15px; border-radius: 12px; font-weight: 600; cursor: pointer; transition: 0.3s; }
+        .btn-confirm:hover { box-shadow: 0 0 20px #bc13fe; }
+        .back-link { display: block; text-align: center; margin-top: 15px; color: #666; text-decoration: none; font-size: 14px; }
     </style>
 </head>
 <body>
 
-<div class="preview-card">
-    <h2>Preview: ตรวจสอบความถูกต้อง 💿</h2>
-    
-    <p><span class="label">ชื่ออัลบั้ม/ศิลปิน:</span><br> <?= e($productname) ?></p>
-    <p><span class="label">แนวเพลง/รายละเอียด:</span><br> <?= nl2br(e($detail)) ?></p>
-    <p><span class="label">ราคา:</span> <span style="color: #d32f2f; font-weight: bold;">฿<?= number_format((float)$price, 2) ?></span></p>
+<div class="container">
+    <h2>PREVIEW YOUR VIBE 💿</h2>
+    <div class="preview-info">
+        <p><strong>NAME:</strong> <?= e($productname) ?></p>
+        <p><strong>PRICE:</strong> <span style="color: #bc13fe;">฿<?= number_format((float)$price, 2) ?></span></p>
+        <p><strong>DETAIL:</strong><br><small><?= nl2br(e($detail)) ?></small></p>
 
-    <?php if ($preview_img): ?>
-        <p><span class="label">รูปหน้าปก:</span></p>
-        <img src="<?= e($preview_img) ?>" width="100%">
-    <?php endif; ?>
-
-    <div class="btn-group">
-        <form method="POST" action="create_save.php" style="display: inline;">
-            <button type="submit" class="btn-save">ยืนยันและบันทึกข้อมูล</button>
-        </form>
-        <a href="index.php" class="btn-back">ย้อนกลับไปแก้ไข</a>
+        <?php if ($preview_img): ?>
+            <p><strong>COVER:</strong><br>
+            <img src="<?= e($preview_img) ?>" alt="Preview"></p>
+        <?php endif; ?>
     </div>
+
+    <form method="POST" action="create_save.php">
+        <button type="submit" class="btn-confirm">✅ ยืนยันและบันทึกข้อมูล</button>
+        <a href="index.php" class="back-link">← กลับไปแก้ไขอีกครั้ง</a>
+    </form>
 </div>
 
 </body>

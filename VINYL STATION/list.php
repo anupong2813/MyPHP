@@ -16,17 +16,65 @@ $products = $stmt->fetchAll();
         h1 { font-weight: 600; background: linear-gradient(to right, #bc13fe, #fe13bc); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
         .btn-add { background: #bc13fe; color: white; text-decoration: none; padding: 10px 20px; border-radius: 12px; font-weight: 600; transition: 0.3s; }
         .btn-add:hover { box-shadow: 0 0 15px #bc13fe; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 30px; max-width: 1100px; margin: auto; }
-        .card { background: #16161a; border-radius: 20px; overflow: hidden; border: 1px solid #222; transition: 0.3s; position: relative; }
-        .card:hover { transform: translateY(-10px); border-color: #bc13fe; box-shadow: 0 10px 25px rgba(188, 19, 254, 0.2); }
-        .card img { width: 100%; aspect-ratio: 1/1; object-fit: cover; }
-        .card-content { padding: 20px; }
-        .card-name { font-weight: 600; font-size: 18px; margin-bottom: 5px; color: #fff; }
-        .card-detail { color: #888; font-size: 14px; margin-bottom: 15px; height: 40px; overflow: hidden; }
-        .card-price { color: #bc13fe; font-weight: 600; font-size: 20px; margin-bottom: 15px; }
         
-        /* ปุ่มจัดการสไตล์นีออน */
-        .actions { display: flex; gap: 10px; margin-top: 10px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 30px; max-width: 1100px; margin: auto; }
+        
+        /* 1. บังคับให้ Card ทุกใบมีความสูงเท่ากันในแถวเดียวกัน */
+        .card { 
+            background: #16161a; 
+            border-radius: 20px; 
+            overflow: hidden; 
+            border: 1px solid #222; 
+            transition: 0.3s; 
+            display: flex; 
+            flex-direction: column; 
+            height: 100%; /* สำคัญมาก */
+        }
+        .card:hover { transform: translateY(-10px); border-color: #bc13fe; box-shadow: 0 10px 25px rgba(188, 19, 254, 0.2); }
+        .card img { width: 100%; aspect-ratio: 1/1; object-fit: cover; flex-shrink: 0; }
+
+        /* 2. จัดการเนื้อหาให้ยืดเต็มพื้นที่ */
+        .card-content { 
+            padding: 20px; 
+            flex-grow: 1; /* ดันเนื้อหาให้ยืดเต็มพื้นที่ */
+            display: flex; 
+            flex-direction: column; 
+        }
+
+        /* 3. บังคับความสูงคงที่เพื่อให้ปุ่มเริ่มในจุดเดียวกันเป๊ะ */
+        .card-name { 
+            font-weight: 600; 
+            font-size: 18px; 
+            margin-bottom: 5px; 
+            color: #fff; 
+            min-height: 54px; /* บังคับความสูง 2 บรรทัด */
+            overflow: hidden;
+        }
+        
+        .card-detail { 
+            color: #888; 
+            font-size: 14px; 
+            margin-bottom: 15px; 
+            min-height: 42px; /* บังคับความสูง 2 บรรทัด */
+            overflow: hidden;
+            line-height: 1.4;
+        }
+        
+        .card-price { 
+            color: #bc13fe; 
+            font-weight: 600; 
+            font-size: 20px; 
+            margin-bottom: 15px; 
+            margin-top: auto; /* ดันราคากับปุ่มลงล่างสุด */
+        }
+        
+        /* 4. ปุ่ม Actions จะติดขอบล่างเสมอ */
+        .actions { 
+            display: flex; 
+            gap: 10px; 
+            padding-top: 5px;
+        }
+        
         .btn-edit { flex: 1; text-align: center; background: transparent; border: 1px solid #bc13fe; color: #bc13fe; text-decoration: none; padding: 8px; border-radius: 10px; font-size: 14px; transition: 0.3s; }
         .btn-edit:hover { background: #bc13fe; color: #fff; }
         .btn-delete { flex: 1; text-align: center; background: transparent; border: 1px solid #ff4d4d; color: #ff4d4d; text-decoration: none; padding: 8px; border-radius: 10px; font-size: 14px; transition: 0.3s; }

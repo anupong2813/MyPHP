@@ -30,15 +30,15 @@ elseif ($p['source'] === 'url') {
     $imgValue = $p['preview_img'];
 }
 elseif ($p['keep_old_image']) {
-    // ดึงค่ารูปภาพเดิมจากฐานข้อมูล Nindam_Products
-    $stmt = $pdo->prepare("SELECT img FROM Nindam_Products WHERE id = ?");
+    // ดึงค่ารูปภาพเดิมจากฐานข้อมูล products
+    $stmt = $pdo->prepare("SELECT img FROM products WHERE id = ?");
     $stmt->execute([$p['id']]);
     $old = $stmt->fetchColumn();
     $imgValue = $old;
 }
 
 /* UPDATE DB - บันทึกข้อมูลใหม่ลงฐานข้อมูล */
-$sql = "UPDATE Nindam_Products 
+$sql = "UPDATE products 
         SET productname = :n, detail = :d, price = :p, img = :i 
         WHERE id = :id";
 $stmt = $pdo->prepare($sql);

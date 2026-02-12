@@ -5,8 +5,10 @@ require __DIR__ . '/csrf.php';
 
 $id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
 $stmt = $pdo->prepare("SELECT * FROM products WHERE id = ?");
-$stmt->execute([$id]);
+// แก้ไขจุดนี้: เติม $ หน้าตัวแปร id
+$stmt->execute([$id]); 
 $product = $stmt->fetch();
+
 if (!$product) die('Vibe not found');
 
 function e($v) { return htmlspecialchars($v ?? '', ENT_QUOTES, 'UTF-8'); }
@@ -15,7 +17,7 @@ function e($v) { return htmlspecialchars($v ?? '', ENT_QUOTES, 'UTF-8'); }
 <html lang="th">
 <head>
     <meta charset="utf-8">
-    <title>Edit Vibe</title>
+    <title>Edit Vibe - VINYL STATION</title>
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
         body { background-color: #0a0a0c; color: #fff; font-family: 'Kanit', sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
@@ -36,15 +38,18 @@ function e($v) { return htmlspecialchars($v ?? '', ENT_QUOTES, 'UTF-8'); }
     <form method="POST" action="edit_pre.php" enctype="multipart/form-data">
         <input type="hidden" name="csrf_token" value="<?= e($_SESSION['csrf_token']) ?>">
         <input type="hidden" name="id" value="<?= e($product['id']) ?>">
+        <input type="hidden" name="old_img" value="<?= e($product['img']) ?>">
         
         <div class="form-group">
-            <label>PRODUCT NAME</label>
+            <label>ARTIST & ALBUM NAME</label>
             <input type="text" name="productname" class="form-control" value="<?= e($product['productname']) ?>" required>
         </div>
+
         <div class="form-group">
-            <label>DETAIL</label>
-            <textarea name="detail" class="form-control" rows="3"><?= e($product['detail']) ?></textarea>
+            <label>ALBUM DETAILS / CONDITION</label>
+            <textarea name="detail" class="form-control" rows="3" placeholder="ระบุรายละเอียดแผ่นหรือสภาพแผ่น..."><?= e($product['detail']) ?></textarea>
         </div>
+
         <div class="form-group">
             <label>PRICE (฿)</label>
             <input type="number" step="0.01" name="price" class="form-control" value="<?= e($product['price']) ?>" required>

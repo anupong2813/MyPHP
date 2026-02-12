@@ -2,7 +2,7 @@
 session_start();
 require __DIR__ . '/csrf.php';
 
-// ตรวจสอบว่ามี token หรือยัง ถ้าไม่มีให้สร้างใหม่ (ฟังก์ชันนี้ควรอยู่ใน csrf.php ของคุณ)
+// ตรวจสอบว่ามี token หรือยัง
 if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
@@ -23,15 +23,14 @@ function e($v) { return htmlspecialchars($v ?? '', ENT_QUOTES, 'UTF-8'); }
         body { background-color: var(--bg); color: #fff; font-family: 'Kanit', sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
         .container { background: var(--card); padding: 40px; border-radius: 24px; box-shadow: 0 0 20px rgba(188, 19, 254, 0.2); width: 100%; max-width: 450px; border: 1px solid #222; }
         
-        /* แก้ไขจุดที่ VS Code แจ้งเตือนตรงนี้ครับ */
         h1 { 
             text-align: center; 
             font-weight: 600; 
             font-size: 28px; 
             margin-bottom: 30px; 
             background: linear-gradient(to right, #bc13fe, #fe13bc); 
-            -webkit-background-clip: text; /* สำหรับ Chrome/Safari */
-            background-clip: text;         /* ค่ามาตรฐานที่ VS Code แนะนำให้ใส่ */
+            -webkit-background-clip: text;
+            background-clip: text;
             -webkit-text-fill-color: transparent; 
         }
 
@@ -54,8 +53,8 @@ function e($v) { return htmlspecialchars($v ?? '', ENT_QUOTES, 'UTF-8'); }
         <label>Artist & Album Name</label>
         <input type="text" name="productname" placeholder="เช่น NewJeans - Get Up" value="<?= e($sticky['productname'] ?? '') ?>" required>
 
-        <label>Genre (Pop, K-Pop, Disco)</label>
-        <input type="text" name="detail" placeholder="ระบุแนวเพลงหรือสภาพแผ่น..." value="<?= e($sticky['detail'] ?? '') ?>" required>
+        <label>Album Details / Condition</label>
+        <input type="text" name="detail" placeholder="ระบุรายละเอียดแผ่นหรือสภาพแผ่น..." value="<?= e($sticky['detail'] ?? '') ?>" required>
 
         <label>Price (THB)</label>
         <input type="number" step="0.01" name="price" placeholder="0.00" value="<?= e($sticky['price'] ?? '') ?>" required>
