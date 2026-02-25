@@ -6,7 +6,9 @@ $id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
 $stmt = $pdo->prepare("SELECT img FROM products WHERE id = ?");
 $stmt->execute([$id]);
 $img = $stmt->fetchColumn();
-if ($img && file_exists($img)) { unlink($img); }
+if ($img && !filter_var($img, FILTER_VALIDATE_URL) && file_exists($img)) {
+    unlink($img);
+}
 
 // ลบข้อมูลในฐานข้อมูล
 $stmt_del = $pdo->prepare("DELETE FROM products WHERE id = ?");
