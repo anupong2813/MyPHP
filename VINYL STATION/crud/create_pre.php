@@ -23,15 +23,23 @@ if (!empty($_FILES['img_upload']['tmp_name'])) {
     $extMap = ['image/jpeg'=>'jpg','image/png'=>'png','image/gif'=>'gif'];
     if (!isset($extMap[$info['mime']])) $errors[] = 'รองรับเฉพาะไฟล์ JPG, PNG และ GIF';
     if (!$errors) {
-        $tmpDir = __DIR__.'/../storage/temp'; if (!is_dir($tmpDir)) { @mkdir($tmpDir, 0777, true); } @chmod($tmpDir, 0777); 
+        $tmpDir = __DIR__.'/../storage/temp'; 
+        if (!is_dir($tmpDir)) { @mkdir($tmpDir, 0777, true); } 
+        @chmod($tmpDir, 0777); 
         $name = 'pre_'.bin2hex(random_bytes(10)).'.'.$extMap[$info['mime']];
-        if (move_uploaded_file($_FILES['img_upload']['tmp_name'], "$tmpDir/$name")) { $preview_img = "storage/temp/$name"; $source = 'upload'; }
+        
+        // ใส่ @ เพื่อซ่อน Error ของระบบ และดักจับถ้าอัปโหลดไม่สำเร็จ
+        if (@move_uploaded_file($_FILES['img_upload']['tmp_name'], "$tmpDir/$name")) { 
+            $preview_img = "storage/temp/$name"; $source = 'upload'; 
+        } else {
+            $errors[] = 'เซิร์ฟเวอร์ไม่สามารถบันทึกรูปได้ (Permission Denied) กรุณาตั้งค่า CHMOD โฟลเดอร์ storage ให้เป็น 777';
+        }
     }
 }
 if (!$preview_img && filter_var($img_url, FILTER_VALIDATE_URL)) { $preview_img = $img_url; $source = 'url'; }
 if ($errors) {
     $_SESSION['sticky'] = compact('productname','category','detail','price','img_url','color','format','released_date','spotify_url');
-    die('<h3>พบข้อผิดพลาด</h3><ul><li>'.implode('</li><li>',$errors).'</li></ul><a href="../index.php">ย้อนกลับไปแก้ไข</a>');
+    die('<!doctype html><html lang="th"><head><meta charset="utf-8"><title>Error</title><link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&display=swap" rel="stylesheet"><style>body{background:#161618;color:#f5f5f7;font-family:"Kanit",sans-serif;display:flex;justify-content:center;align-items:center;height:100vh;margin:0;} .box{background:#1c1c1e;padding:40px;border-radius:12px;border:1px solid #38383a;text-align:center;} ul{text-align:left;color:#ff3b30;margin-bottom:20px;} a{color:#ffffff;text-decoration:none;background:#ff3b30;padding:10px 20px;border-radius:20px;font-weight:bold;}</style></head><body><div class="box"><h3>พบข้อผิดพลาด</h3><ul><li>'.implode('</li><li>',$errors).'</li></ul><a href="../index.php">ย้อนกลับไปแก้ไข</a></div></body></html>');
 }
 $_SESSION['preview'] = compact('productname','category','detail','price','preview_img','source','color','format','released_date','spotify_url');
 ?>
