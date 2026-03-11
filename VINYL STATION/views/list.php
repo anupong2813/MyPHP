@@ -12,7 +12,7 @@ $sort = trim($_GET['sort'] ?? 'newest');
 $sql = "SELECT id, productname, detail, price, img, color, format, released_date, category FROM products WHERE 1=1";
 $params = [];
 
-// เงื่อนไขค้นหา (เพิ่ม category LIKE :s5 เพื่อให้ค้นหาแนวเพลงผ่านช่อง Search ได้)
+// เงื่อนไขค้นหา (ค้นหาชื่อ, รายละเอียด, แนวเพลง ฯลฯ)
 if ($search !== '') {
     if (preg_match('/^(\d+(?:\.\d+)?)\s*-\s*(\d+(?:\.\d+)?)$/', $search, $matches)) {
         $sql .= " AND price BETWEEN :min AND :max";
@@ -25,7 +25,7 @@ if ($search !== '') {
     }
 }
 
-// เงื่อนไขหมวดหมู่จาก Dropdown (เปลี่ยนจาก = เป็น LIKE เพื่อให้เจอแนวเพลงที่ผสมกัน)
+// เงื่อนไขหมวดหมู่จาก Dropdown
 if ($category !== '') {
     $sql .= " AND category LIKE :cat";
     $params[':cat'] = "%$category%";
@@ -79,7 +79,7 @@ if (isset($_GET['ajax_live'])) {
 <html lang="th">
 <head>
     <meta charset="utf-8">
-    <title>My Vinyl Collection</title>
+    <title>My Vinyl Collection - VINYL STATION</title>
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&family=Montserrat:wght@700;800;900&display=swap" rel="stylesheet">
     <script>const savedTheme = localStorage.getItem('theme') || 'dark'; document.documentElement.setAttribute('data-theme', savedTheme);</script>
     <style>
@@ -175,6 +175,7 @@ if (isset($_GET['ajax_live'])) {
 
     <div class="nav-actions">
         <?php if ($isAdmin): ?>
+            <a href="../admin_orders.php" class="nav-btn add-btn" style="background: #ffffff !important; color: #111111 !important; border: 2px solid #111111 !important;">📦 Orders</a>
             <a href="../index.php" class="nav-btn add-btn">+ Add New Vibe</a>
             <a href="../logout.php" class="nav-btn logout-btn">Logout (Admin)</a>
         <?php else: ?>

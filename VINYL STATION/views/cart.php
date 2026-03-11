@@ -87,7 +87,7 @@ function getDisplayImg($img) {
         .summary-text { color: var(--text-muted); font-size: 14px; margin-bottom: 10px; font-weight: 700; }
         .total-price { font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 36px; color: var(--text-main); margin-bottom: 20px; }
         
-        .btn-checkout { background: #111111 !important; color: #ffffff !important; border: 2px solid #111111 !important; padding: 12px 30px; font-family: 'Montserrat', sans-serif; font-weight: 800; font-size: 15px; border-radius: 25px; cursor: pointer; transition: 0.3s; text-transform: capitalize; }
+        .btn-checkout { background: #111111 !important; color: #ffffff !important; border: 2px solid #111111 !important; padding: 12px 30px; font-family: 'Montserrat', sans-serif; font-weight: 800; font-size: 15px; border-radius: 25px; cursor: pointer; transition: 0.3s; text-transform: capitalize; text-decoration:none; display:inline-block;}
         .btn-checkout:hover { background: #333333 !important; }
         .btn-clear { background: #ffffff !important; color: #111111 !important; border: 2px solid #111111 !important; padding: 10px 20px; border-radius: 25px; cursor: pointer; text-decoration: none; font-size: 13px; margin-right: 15px; transition: 0.3s; font-weight: 800; font-family: 'Montserrat', sans-serif;}
         .btn-clear:hover { background: #f0f0f0 !important; }
@@ -133,7 +133,7 @@ function getDisplayImg($img) {
             <div class="summary-text">TOTAL ESTIMATE (<?= array_sum($_SESSION['cart']) ?> ITEMS)</div>
             <div class="total-price">฿<?= number_format($totalPrice, 2) ?></div>
             <a href="cart.php?action=clear" class="btn-clear" onclick="return confirm('ต้องการล้างตะกร้าทั้งหมดใช่หรือไม่?')">Clear Cart</a>
-            <button class="btn-checkout" onclick="alert('Proceeding to checkout!')">Checkout Securely</button>
+            <a href="../checkout.php" class="btn-checkout">Checkout Securely</a>
         </div>
     <?php endif; ?>
 </div>

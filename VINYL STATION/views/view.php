@@ -70,7 +70,6 @@ function getDisplayImg($img) {
         
         .view-title { font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 36px; margin: 0; text-transform: uppercase; line-height: 1.1; word-break: break-word; padding-right: 50px; }
         
-        /* เปลี่ยนสไตล์สำหรับ Category ให้เด่นขึ้นมาแทนที่คำเก่า */
         .view-subtitle { color: var(--text-main); font-family: 'Montserrat', sans-serif; font-size: 14px; font-weight: 700; margin-top: 8px; margin-bottom: 25px; text-transform: uppercase; letter-spacing: 1px; display: inline-block; padding: 5px 12px; border: 1px solid var(--border); border-radius: 20px;}
         
         .price-fav-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
@@ -101,6 +100,7 @@ function getDisplayImg($img) {
     <a href="list.php" class="logo">VINYL STATION</a>
     <div class="nav-actions">
         <?php if ($isAdmin): ?>
+            <a href="../admin_orders.php" class="nav-btn add-btn" style="background: #ffffff !important; color: #111111 !important; border: 2px solid #111111 !important;">📦 Orders</a>
             <a href="../index.php" class="nav-btn add-btn" style="background: #111111 !important; color: #ffffff !important; border: 2px solid #111111 !important;">+ Add New Vibe</a>
             <a href="../logout.php" class="nav-btn logout-btn" style="border: 1px solid var(--border); background: transparent; color: var(--text-muted);">Logout</a>
         <?php else: ?>
@@ -145,7 +145,7 @@ function getDisplayImg($img) {
             <form action="cart.php?action=add" method="POST" style="display:flex; width: 100%; gap: 15px;">
                 <input type="hidden" name="product_id" value="<?= $product['id'] ?>">
                 <button type="submit" class="btn-cart">Add to Cart</button>
-                <button type="button" class="btn-buy" onclick="alert('Proceeding to Checkout!')">Buy Now</button>
+                <a href="../checkout.php?buy_now=<?= $product['id'] ?>" class="btn-buy" style="text-decoration:none;">Buy Now</a>
             </form>
             <?php else: ?>
                 <a href="../crud/edit.php?id=<?= $product['id'] ?>" class="btn-cart" style="text-decoration:none;">Edit Vibe</a>
