@@ -8,13 +8,25 @@ if (empty($_SESSION['checkout_data'])) { die('No order data found.'); }
 
 $c_name = trim($_POST['customer_name'] ?? '');
 $c_contact = trim($_POST['contact_info'] ?? '');
+
+// 🟢 1. รับข้อมูลที่อยู่จัดส่ง
+$address = trim($_POST['address'] ?? '');
+$sub_district = trim($_POST['sub_district'] ?? '');
+$district = trim($_POST['district'] ?? '');
+$province = trim($_POST['province'] ?? '');
+$zipcode = trim($_POST['zipcode'] ?? '');
+
 $total_price = $_SESSION['checkout_data']['total_price'];
 $order_details = $_SESSION['checkout_data']['order_details'];
 $main_img = $_SESSION['checkout_data']['main_img'];
 
-if ($c_name === '' || $c_contact === '' || empty($_FILES['slip_upload']['tmp_name'])) {
+// เช็คข้อมูลให้ครบ
+if ($c_name === '' || $c_contact === '' || $address === '' || $sub_district === '' || $district === '' || $province === '' || $zipcode === '' || empty($_FILES['slip_upload']['tmp_name'])) {
     die('ข้อมูลไม่ครบถ้วน กรุณาย้อนกลับไปกรอกใหม่');
 }
+
+// รวมที่อยู่เป็นบรรทัดเดียว
+$full_shipping_address = $address . " ต." . $sub_district . " อ." . $district . " จ." . $province . " " . $zipcode;
 
 // จัดการอัปโหลดสลิป
 $slip_img = '';
@@ -34,10 +46,21 @@ if ($info && isset($extMap[$info['mime']])) {
     die('ไฟล์สลิปต้องเป็นรูปภาพ JPG หรือ PNG เท่านั้น');
 }
 
-// บันทึกลงฐานข้อมูล
-$sql = "INSERT INTO orders (customer_name, contact_info, order_details, total_price, main_img, slip_img) VALUES (?, ?, ?, ?, ?, ?)";
+// 🟢 2. บันทึกลงฐานข้อมูล (เพิ่ม full_shipping_address)
+$sql = "INSERT INTO orders (customer_name, contact_info, shipping_address, order_details, total_price, main_img, slip_img) VALUES (?, ?, ?, ?, ?, ?, ?)";
 $stmt = $pdo->prepare($sql);
-$stmt->execute([$c_name, $c_contact, $order_details, $total_price, $main_img, $slip_img]);
+$stmt->execute([$c_name, $c_contact, $full_shipping_address, $order_details, $total_price, $main_img, $slip_img]);
+
+// 🟢 3. ตัดสต๊อกสินค้า
+if (isset($_GET['buy_now']) && isset($_SESSION['checkout_data']['buy_now_id'])) {
+    $stmt = $pdo->prepare("UPDATE products SET stock = GREATEST(0, stock - 1) WHERE id = ?");
+    $stmt->execute([$_SESSION['checkout_data']['buy_now_id']]);
+} elseif (!empty($_SESSION['cart'])) {
+    foreach ($_SESSION['cart'] as $pid => $qty) {
+        $stmt = $pdo->prepare("UPDATE products SET stock = GREATEST(0, stock - ?) WHERE id = ?");
+        $stmt->execute([$qty, $pid]);
+    }
+}
 
 // ล้างตะกร้าสินค้า (ถ้าไม่ได้กด Buy Now)
 if (!isset($_GET['buy_now'])) {

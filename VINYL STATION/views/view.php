@@ -141,12 +141,14 @@ function getDisplayImg($img) {
         </div>
         
         <div class="btn-group">
-            <?php if (!$isAdmin): ?>
-            <form action="cart.php?action=add" method="POST" style="display:flex; width: 100%; gap: 15px;">
-                <input type="hidden" name="product_id" value="<?= $product['id'] ?>">
-                <button type="submit" class="btn-cart">Add to Cart</button>
-                <a href="../checkout.php?buy_now=<?= $product['id'] ?>" class="btn-buy" style="text-decoration:none;">Buy Now</a>
-            </form>
+            <?php if ($product['stock'] <= 0): ?>
+                <div style="color: #ff3b30; font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 24px; padding: 10px 0; letter-spacing: 2px;">SOLD OUT</div>
+            <?php elseif (!$isAdmin): ?>
+                <form action="cart.php?action=add" method="POST" style="display:flex; width: 100%; gap: 15px;">
+                    <input type="hidden" name="product_id" value="<?= $product['id'] ?>">
+                    <button type="submit" class="btn-cart">Add to Cart</button>
+                    <a href="../checkout.php?buy_now=<?= $product['id'] ?>" class="btn-buy" style="text-decoration:none;">Buy Now</a>
+                </form>
             <?php else: ?>
                 <a href="../crud/edit.php?id=<?= $product['id'] ?>" class="btn-cart" style="text-decoration:none;">Edit Vibe</a>
                 <a href="../crud/delete.php?id=<?= $product['id'] ?>" class="btn-buy" style="text-decoration:none;" onclick="return confirm('Are you sure you want to delete this vibe?')">Delete Vibe</a>

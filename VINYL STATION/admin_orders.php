@@ -29,16 +29,19 @@ function getDisplayImg($img) {
         .back-link { color: var(--text-muted); text-decoration: none; font-weight: 700; transition: 0.3s; }
         .back-link:hover { color: var(--text-main); }
         
-        .order-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 20px; display: flex; gap: 20px; align-items: center; box-shadow: 0 5px 15px var(--shadow);}
+        .order-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 25px; margin-bottom: 20px; display: flex; gap: 20px; align-items: flex-start; box-shadow: 0 5px 15px var(--shadow);}
         .o-img { width: 100px; height: 100px; object-fit: cover; border-radius: 8px; background: #000; border: 1px solid #222;}
         .o-details { flex-grow: 1; }
-        .o-id { font-family: 'Montserrat', sans-serif; font-weight: 800; font-size: 14px; color: var(--text-muted); margin-bottom: 5px;}
-        .o-items { font-weight: 600; font-size: 16px; margin-bottom: 5px; color: var(--text-main);}
-        .o-customer { font-size: 13px; color: var(--text-muted); }
-        .o-price { font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 22px; color: #ff3b30;}
-        .btn-slip { background: #111; color: #fff; text-decoration: none; padding: 10px 20px; border-radius: 25px; font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 12px; transition: 0.3s;}
+        .o-id { font-family: 'Montserrat', sans-serif; font-weight: 800; font-size: 14px; color: var(--text-muted); margin-bottom: 8px;}
+        .o-items { font-weight: 600; font-size: 18px; margin-bottom: 8px; color: var(--text-main);}
+        .o-customer { font-size: 14px; color: var(--text-muted); margin-bottom: 6px; }
+        .o-address { font-size: 14px; color: var(--text-main); background: var(--bg); padding: 10px; border-radius: 6px; border: 1px solid var(--border); margin-top: 10px; display: inline-block;}
+        
+        .o-right { text-align: right; min-width: 150px; }
+        .o-price { font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 24px; color: #ff3b30;}
+        .btn-slip { background: #111; color: #fff; text-decoration: none; padding: 10px 20px; border-radius: 25px; font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 12px; transition: 0.3s; display: inline-block; margin-top: 15px;}
         .btn-slip:hover { background: #333; }
-        .date { font-size: 12px; color: var(--text-muted); margin-top: 10px;}
+        .date { font-size: 12px; color: var(--text-muted); margin-top: 15px;}
     </style>
 </head>
 <body>
@@ -62,15 +65,14 @@ function getDisplayImg($img) {
                 <div class="o-details">
                     <div class="o-id">ORDER ID: #<?= str_pad($o['id'], 5, '0', STR_PAD_LEFT) ?></div>
                     <div class="o-items"><?= e($o['order_details']) ?></div>
-                    <div class="o-customer">👤 <?= e($o['customer_name']) ?> | 📞 <?= e($o['contact_info']) ?></div>
-                    <div class="date">📅 <?= date('d M Y, H:i', strtotime($o['order_date'])) ?></div>
+                    <div class="o-customer">👤 <?= e($o['customer_name']) ?> &nbsp;|&nbsp; 📞 <?= e($o['contact_info']) ?></div>
+                    <div class="o-address">📍 <strong>จัดส่งที่:</strong> <?= e($o['shipping_address'] ?? 'ไม่ระบุ') ?></div>
                 </div>
                 
-                <div style="text-align: right;">
+                <div class="o-right">
                     <div class="o-price">฿<?= number_format($o['total_price'], 2) ?></div>
-                    <div style="margin-top: 15px;">
-                        <a href="<?= e(getDisplayImg($o['slip_img'])) ?>" target="_blank" class="btn-slip">🔍 View Slip</a>
-                    </div>
+                    <a href="<?= e(getDisplayImg($o['slip_img'])) ?>" target="_blank" class="btn-slip">🔍 View Slip</a>
+                    <div class="date">📅 <?= date('d M Y, H:i', strtotime($o['order_date'])) ?></div>
                 </div>
             </div>
             <?php endforeach; ?>

@@ -9,10 +9,10 @@ $search = trim($_GET['search'] ?? '');
 $category = trim($_GET['category'] ?? '');
 $sort = trim($_GET['sort'] ?? 'newest');
 
-$sql = "SELECT id, productname, detail, price, img, color, format, released_date, category FROM products WHERE 1=1";
+$sql = "SELECT id, productname, detail, price, img, color, format, released_date, category, stock FROM products WHERE 1=1";
 $params = [];
 
-// เงื่อนไขค้นหา (ค้นหาชื่อ, รายละเอียด, แนวเพลง ฯลฯ)
+// เงื่อนไขค้นหา
 if ($search !== '') {
     if (preg_match('/^(\d+(?:\.\d+)?)\s*-\s*(\d+(?:\.\d+)?)$/', $search, $matches)) {
         $sql .= " AND price BETWEEN :min AND :max";
@@ -25,7 +25,7 @@ if ($search !== '') {
     }
 }
 
-// เงื่อนไขหมวดหมู่จาก Dropdown
+// เงื่อนไขหมวดหมู่
 if ($category !== '') {
     $sql .= " AND category LIKE :cat";
     $params[':cat'] = "%$category%";
@@ -54,24 +54,71 @@ if (isset($_GET['ajax_live'])) {
             $imgSrc = getDisplayImg($p['img']); 
             $is_fav = in_array($p['id'], $_SESSION['favorites']);
             ?>
-            <div class="card">
+            <div class="card" <?= ($p['stock'] <= 0) ? 'style="opacity: 0.85;"' : '' ?>>
                 <?php if (!$isAdmin): ?>
                 <a href="javascript:void(0);" onclick="toggleFavorite(event, <?= $p['id'] ?>, this)" class="fav-icon-card" data-fav="<?= $is_fav ? '1' : '0' ?>" title="<?= $is_fav ? 'Remove from Favorites' : 'Add to Favorites' ?>">
                     <?= $is_fav ? '❤️' : '🤍' ?>
                 </a>
                 <?php endif; ?>
-                <a href="view.php?id=<?= $p['id'] ?>"><div class="img-wrapper">
-                <?php if ($imgSrc): ?><img src="<?= htmlspecialchars($imgSrc) ?>" alt="cover"><?php else: ?><div class="no-cover">NO COVER</div><?php endif; ?>
-                <span class="badge">VINYL</span></div></a><div class="card-content"><a href="view.php?id=<?= $p['id'] ?>" class="card-link"><div class="card-name"><?= htmlspecialchars($p['productname']) ?></div></a>
-                <div class="card-price">฿<?= number_format($p['price'], 2) ?></div>
-                <?php if ($isAdmin): ?>
-                <div class="actions">
-                <a href="../crud/edit.php?id=<?= htmlspecialchars($p['id']) ?>" class="btn-edit">Edit</a>
-                <a href="../crud/delete.php?id=<?= htmlspecialchars($p['id']) ?>" class="btn-delete" onclick="return confirm('Are you sure?')">Delete</a>
+
+                <a href="view.php?id=<?= $p['id'] ?>">
+                    <div class="img-wrapper">
+                        <?php if ($imgSrc): ?><img src="<?= htmlspecialchars($imgSrc) ?>" alt=""><?php else: ?><div class="no-cover">NO COVER</div><?php endif; ?>
+                        
+                        <?php if ($p['stock'] <= 0): ?>
+                            <div class="out-of-stock-overlay">
+                                <div class="sign-board">
+                                    <div class="screw tl"></div><div class="screw tr"></div>
+                                    <div class="screw bl"></div><div class="screw br"></div>
+                                    <div class="sign-board-inner">
+                                        <div class="sign-line"></div>
+                                        <span class="sign-text">SOLD OUT</span>
+                                        <div class="sign-line"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        <?php endif; ?>
+                        
+                        <span class="badge">VINYL</span>
+                    </div>
+                </a>
+                <div class="card-content">
+                    <a href="view.php?id=<?= $p['id'] ?>" class="card-link"><div class="card-name"><?= htmlspecialchars($p['productname']) ?></div></a>
+                    <div class="card-price">฿<?= number_format($p['price'], 2) ?></div>
+                    
+                    <div class="stock-indicator">
+                        <?php if ($isAdmin): ?>
+                            <a href="../update_stock.php?action=decrease&id=<?= $p['id'] ?>" class="stock-ctrl-btn">-</a>
+                        <?php endif; ?>
+                        
+                        <?php if ($p['stock'] >= 5): ?>
+                            <span class="stock-badge badge-5"><?= $p['stock'] ?> IN STOCK</span>
+                        <?php elseif ($p['stock'] == 4): ?>
+                            <span class="stock-badge badge-4"><?= $p['stock'] ?> IN STOCK</span>
+                        <?php elseif ($p['stock'] == 3): ?>
+                            <span class="stock-badge badge-3">ONLY <?= $p['stock'] ?> LEFT</span>
+                        <?php elseif ($p['stock'] == 2): ?>
+                            <span class="stock-badge badge-2">ONLY <?= $p['stock'] ?> LEFT</span>
+                        <?php elseif ($p['stock'] == 1): ?>
+                            <span class="stock-badge badge-1">ONLY 1 LEFT</span>
+                        <?php else: ?>
+                            <span class="stock-badge badge-0">SOLD OUT</span>
+                        <?php endif; ?>
+
+                        <?php if ($isAdmin): ?>
+                            <a href="../update_stock.php?action=increase&id=<?= $p['id'] ?>" class="stock-ctrl-btn">+</a>
+                        <?php endif; ?>
+                    </div>
+
+                    <?php if ($isAdmin): ?>
+                    <div class="actions">
+                        <a href="../crud/edit.php?id=<?= htmlspecialchars($p['id']) ?>" class="btn-edit">Edit</a>
+                        <a href="../crud/delete.php?id=<?= htmlspecialchars($p['id']) ?>" class="btn-delete" onclick="return confirm('Are you sure?')">Delete</a>
+                    </div>
+                    <?php endif; ?>
                 </div>
-                <?php endif; ?>
-            </div></div>
-        <?php endforeach; echo '</div>';
+            </div>
+            <?php endforeach; echo '</div>';
     } exit;
 }
 ?>
@@ -95,7 +142,6 @@ if (isset($_GET['ajax_live'])) {
         
         .filter-group input, .filter-group select { background: transparent; border: none; color: var(--text-main); font-size: 13px; font-weight:600; outline: none; padding: 8px; font-family: 'Kanit', sans-serif; cursor: pointer; text-transform: uppercase; text-align: center; text-align-last: center; }
         .filter-group input { flex-grow: 1; cursor: text; text-transform: none; font-weight:400; text-align: left;}
-        
         .filter-group input::placeholder { color: var(--text-muted); }
         .filter-group select option { background: var(--bg); color: var(--text-main); }
         .divider { width: 1px; height: 20px; background: var(--border); margin: 0 5px; }
@@ -128,22 +174,95 @@ if (isset($_GET['ajax_live'])) {
         .fav-icon-card { position: absolute; top: 12px; right: 12px; z-index: 10; background: var(--card); border-radius: 50%; width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; text-decoration: none; box-shadow: 0 2px 10px rgba(0,0,0,0.1); transition: 0.3s; border: 1px solid var(--border); font-size: 15px;}
         .fav-icon-card:hover { transform: scale(1.1); }
 
-        .img-wrapper { aspect-ratio: 1/1; position: relative; overflow: hidden; border-radius: 15px 15px 0 0; background: #000000; display: flex; align-items:center; justify-content:center; border-bottom: 1px solid #222;}
-        .img-wrapper img { width: 100%; height: 100%; object-fit: cover; }
+        .img-wrapper { aspect-ratio: 1/1; position: relative; overflow: hidden; border-radius: 15px 15px 0 0; background: #000000; display: flex; align-items:center; justify-content:center; border-bottom: 1px solid var(--border);}
+        .img-wrapper img { width: 100%; height: 100%; object-fit: cover; transition: opacity 0.3s;}
         .no-cover { font-family: 'Montserrat', sans-serif; font-weight: 900; color: #555; font-size: 20px;}
-        .badge { position: absolute; bottom: 12px; right: 12px; background: var(--text-main); color: var(--bg); border: 1px solid var(--border); font-size: 10px; font-weight: 700; padding: 5px 10px; border-radius: 20px; transition: 0.3s;}
+        .badge { position: absolute; bottom: 12px; right: 12px; background: var(--text-main); color: var(--bg); border: 1px solid var(--border); font-size: 10px; font-weight: 700; padding: 5px 10px; border-radius: 20px; transition: 0.3s; z-index: 10;}
         
+        /* 🟢 CSS ป้าย SOLD OUT (Red Board - ไม่มีเชือก) */
+        .out-of-stock-overlay { 
+            position: absolute; top:0; left:0; width:100%; height:100%; 
+            background: rgba(0,0,0,0.5); /* พื้นหลังดำโปร่งแสง */
+            display:flex; justify-content:center; align-items:center; z-index: 5; 
+        }
+        .sign-board { 
+            background: linear-gradient(180deg, #d31b33 0%, #a61226 100%); 
+            border-radius: 8px; 
+            padding: 10px 15px; 
+            position: relative; 
+            border: 2px solid #6b0c19; 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.6), inset 0px 2px 3px rgba(255,255,255,0.3); 
+            transform: rotate(-8deg); /* เอียงป้ายเล็กน้อยให้ดูเท่ */
+            min-width: 170px;
+        }
+        .sign-board-inner { 
+            border: 2px solid rgba(255,255,255,0.9); 
+            border-radius: 4px; 
+            padding: 8px 12px; 
+            position: relative; 
+        }
+        
+        /* หมุด 4 มุม */
+        .screw { 
+            position: absolute; width: 6px; height: 6px; background: #eab308; border-radius: 50%; 
+            box-shadow: inset -1px -1px 2px rgba(0,0,0,0.6), 0 1px 1px rgba(255,255,255,0.4); z-index: 3; 
+        }
+        .screw::after { 
+            content: ''; position: absolute; top: 50%; left: 50%; width: 4px; height: 1px; 
+            background: rgba(0,0,0,0.5); transform: translate(-50%, -50%) rotate(45deg); 
+        }
+        .screw.tl { top: 6px; left: 6px; }
+        .screw.tr { top: 6px; right: 6px; }
+        .screw.bl { bottom: 6px; left: 6px; }
+        .screw.br { bottom: 6px; right: 6px; }
+        
+        /* ข้อความและเส้นขีด */
+        .sign-text { 
+            color: #ffffff; 
+            font-family: 'Montserrat', sans-serif; 
+            font-weight: 900; 
+            font-size: 26px; 
+            letter-spacing: 1px; 
+            text-transform: uppercase; 
+            display: block; 
+            text-align: center; 
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5); 
+            transform: scaleY(1.1); /* ดึงตัวอักษรให้สูงขึ้นเล็กน้อย */
+            margin: 6px 0; 
+            line-height: 1; 
+        }
+        .sign-line { 
+            height: 2px; 
+            background: rgba(255,255,255,0.9); 
+            width: 100%; 
+            border-radius: 2px; 
+        }
+
         .card-content { padding: 20px; flex-grow: 1; display: flex; flex-direction: column; }
         .card-name { font-family: 'Montserrat', sans-serif; font-weight: 800; font-size: 16px; color: var(--text-main); margin-bottom: 8px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; transition: 0.3s; }
         .card-link:hover .card-name { opacity: 0.7; }
-        .card-price { color: var(--text-main); font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 20px; margin-top: auto; margin-bottom: 15px; }
         
+        .card-price { color: var(--text-main); font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 20px; margin-bottom: 10px; }
+        
+        .stock-indicator { display: flex; align-items: center; gap: 8px; margin-bottom: 15px; margin-top: auto;}
+        .stock-badge { font-family: 'Montserrat', sans-serif; font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 12px; letter-spacing: 0.5px; }
+        
+        .badge-5 { background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid #10b981; }
+        .badge-4 { background: rgba(132, 204, 22, 0.15); color: #84cc16; border: 1px solid #84cc16; }
+        .badge-3 { background: rgba(245, 158, 11, 0.15); color: #f59e0b; border: 1px solid #f59e0b; }
+        .badge-2 { background: rgba(249, 115, 22, 0.15); color: #f97316; border: 1px solid #f97316; }
+        .badge-1 { background: rgba(239, 68, 68, 0.15); color: #ef4444; border: 1px solid #ef4444; }
+        .badge-0 { background: #ef4444; color: #fff; border: 1px solid #ef4444; } 
+        
+        .stock-ctrl-btn { background: var(--input-bg); color: var(--text-main); width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; border-radius: 6px; font-weight: bold; font-size: 16px; transition: 0.3s; border: 1px solid var(--border); font-family: monospace;}
+        .stock-ctrl-btn:hover { background: var(--text-main); color: var(--bg); border-color: var(--text-main); }
+
         .actions { display: flex; gap: 10px; }
         .actions a { flex: 1; text-align: center; font-family: 'Montserrat', sans-serif; font-weight: 800; font-size: 12px; padding: 10px 0; border-radius: 25px; transition: 0.3s; text-transform: capitalize;}
-        .btn-edit { background: #ffffff !important; color: #111111 !important; border: 2px solid #111111 !important; }
-        .btn-edit:hover { background: #f0f0f0 !important; }
-        .btn-delete { background: #111111 !important; color: #ffffff !important; border: 2px solid #111111 !important; }
-        .btn-delete:hover { background: #333333 !important; }
+        .btn-edit { background: transparent !important; color: var(--text-main) !important; border: 1px solid var(--border) !important; }
+        .btn-edit:hover { border-color: var(--text-main) !important; }
+        .btn-delete { background: #ff4d4d !important; color: #fff !important; border: 1px solid #ff4d4d !important; }
+        .btn-delete:hover { background: #ff1a1a !important; }
         @media (max-width: 900px) { .filter-group { max-width: 100%; margin: 10px 0;} }
     </style>
 </head>
@@ -202,7 +321,7 @@ if (isset($_GET['ajax_live'])) {
                 $imgSrc = getDisplayImg($p['img']); 
                 $is_fav = in_array($p['id'], $_SESSION['favorites']);
             ?>
-            <div class="card">
+            <div class="card" <?= ($p['stock'] <= 0) ? 'style="opacity: 0.85;"' : '' ?>>
                 <?php if (!$isAdmin): ?>
                 <a href="javascript:void(0);" onclick="toggleFavorite(event, <?= $p['id'] ?>, this)" class="fav-icon-card" data-fav="<?= $is_fav ? '1' : '0' ?>" title="<?= $is_fav ? 'Remove from Favorites' : 'Add to Favorites' ?>">
                     <?= $is_fav ? '❤️' : '🤍' ?>
@@ -212,6 +331,21 @@ if (isset($_GET['ajax_live'])) {
                 <a href="view.php?id=<?= $p['id'] ?>">
                     <div class="img-wrapper">
                         <?php if ($imgSrc): ?><img src="<?= htmlspecialchars($imgSrc) ?>" alt=""><?php else: ?><div class="no-cover">NO COVER</div><?php endif; ?>
+                        
+                        <?php if ($p['stock'] <= 0): ?>
+                            <div class="out-of-stock-overlay">
+                                <div class="sign-board">
+                                    <div class="screw tl"></div><div class="screw tr"></div>
+                                    <div class="screw bl"></div><div class="screw br"></div>
+                                    <div class="sign-board-inner">
+                                        <div class="sign-line"></div>
+                                        <span class="sign-text">SOLD OUT</span>
+                                        <div class="sign-line"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        <?php endif; ?>
+                        
                         <span class="badge">VINYL</span>
                     </div>
                 </a>
@@ -219,6 +353,30 @@ if (isset($_GET['ajax_live'])) {
                     <a href="view.php?id=<?= $p['id'] ?>" class="card-link"><div class="card-name"><?= htmlspecialchars($p['productname']) ?></div></a>
                     <div class="card-price">฿<?= number_format($p['price'], 2) ?></div>
                     
+                    <div class="stock-indicator">
+                        <?php if ($isAdmin): ?>
+                            <a href="../update_stock.php?action=decrease&id=<?= $p['id'] ?>" class="stock-ctrl-btn">-</a>
+                        <?php endif; ?>
+                        
+                        <?php if ($p['stock'] >= 5): ?>
+                            <span class="stock-badge badge-5"><?= $p['stock'] ?> IN STOCK</span>
+                        <?php elseif ($p['stock'] == 4): ?>
+                            <span class="stock-badge badge-4"><?= $p['stock'] ?> IN STOCK</span>
+                        <?php elseif ($p['stock'] == 3): ?>
+                            <span class="stock-badge badge-3">ONLY <?= $p['stock'] ?> LEFT</span>
+                        <?php elseif ($p['stock'] == 2): ?>
+                            <span class="stock-badge badge-2">ONLY <?= $p['stock'] ?> LEFT</span>
+                        <?php elseif ($p['stock'] == 1): ?>
+                            <span class="stock-badge badge-1">ONLY 1 LEFT</span>
+                        <?php else: ?>
+                            <span class="stock-badge badge-0">SOLD OUT</span>
+                        <?php endif; ?>
+
+                        <?php if ($isAdmin): ?>
+                            <a href="../update_stock.php?action=increase&id=<?= $p['id'] ?>" class="stock-ctrl-btn">+</a>
+                        <?php endif; ?>
+                    </div>
+
                     <?php if ($isAdmin): ?>
                     <div class="actions">
                         <a href="../crud/edit.php?id=<?= htmlspecialchars($p['id']) ?>" class="btn-edit">Edit</a>

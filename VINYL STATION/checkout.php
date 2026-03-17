@@ -40,11 +40,12 @@ if (isset($_GET['buy_now'])) {
 
 if (empty($checkout_items)) { header("Location: views/list.php"); exit; }
 
-// เก็บข้อมูลไว้ส่งไปหน้า Process
+// 🟢 ส่วนที่แก้ไข: เก็บข้อมูลไว้ส่งไปหน้า Process (เพิ่ม buy_now_id แล้ว)
 $_SESSION['checkout_data'] = [
     'total_price' => $totalPrice,
     'order_details' => implode(", ", $order_details),
-    'main_img' => $main_img
+    'main_img' => $main_img,
+    'buy_now_id' => isset($_GET['buy_now']) ? filter_input(INPUT_GET, 'buy_now', FILTER_VALIDATE_INT) : null
 ];
 
 function e($v) { return htmlspecialchars($v ?? '', ENT_QUOTES, 'UTF-8'); }
@@ -54,7 +55,6 @@ function getDisplayImg($img) {
 }
 
 // 🟢 ระบุพาร์ทไฟล์รูป QR Code ของคุณที่นำไปใส่ในโฟลเดอร์ storage 
-// (ถ้าคุณตั้งชื่ออื่น หรือใช้นามสกุล .png อย่าลืมมาเปลี่ยนชื่อตรงนี้ให้ตรงกันนะครับ)
 $qr_url = "storage/my_qrcode.jpg"; 
 ?>
 <!doctype html>
@@ -77,22 +77,24 @@ $qr_url = "storage/my_qrcode.jpg";
         .total-row { display: flex; justify-content: space-between; font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 24px; padding-top: 20px; border-top: 2px solid var(--text-main); margin-top: 20px;}
         
         .qr-box { text-align: center; margin-bottom: 25px; padding: 20px; background: #ffffff; border-radius: 12px; }
-        
-        /* ขยายขนาด max-width ให้รูป QR Code ใหญ่ขึ้นเพื่อให้อ่านชื่อบัญชีได้ชัดเจน */
         .qr-box img { max-width: 320px; width: 100%; border: 1px solid #e5e5ea; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);}
-        
         .qr-text { color: #1d1d1f; font-family: 'Montserrat', sans-serif; font-weight: 800; margin-top: 15px; font-size: 18px;}
         
         label { display: block; margin-bottom: 8px; font-size: 12px; color: var(--text-muted); font-family: 'Montserrat', sans-serif; font-weight: 700; text-transform: uppercase;}
-        input[type="text"] { width: 100%; padding: 14px; margin-bottom: 20px; background: var(--input-bg); border: 1px solid var(--border); border-radius: 6px; color: var(--text-main); font-family: 'Kanit', sans-serif; font-size: 14px; box-sizing: border-box; }
+        input[type="text"] { width: 100%; padding: 14px; margin-bottom: 15px; background: var(--input-bg); border: 1px solid var(--border); border-radius: 6px; color: var(--text-main); font-family: 'Kanit', sans-serif; font-size: 14px; box-sizing: border-box; }
         input[type="file"] { width: 100%; padding: 10px; color: var(--text-muted); border: 1px dashed var(--border); background: transparent; margin-bottom: 20px; box-sizing: border-box;}
         input[type="file"]::file-selector-button { background: var(--text-main); color: var(--bg); border: none; padding: 8px 16px; border-radius: 4px; font-weight: 600; cursor: pointer; margin-right: 15px; }
         
-        .btn-submit { width: 100%; padding: 16px; background: #111111 !important; color: #ffffff !important; border: 2px solid #111111 !important; border-radius: 25px; font-size: 15px; font-weight: 900; font-family: 'Montserrat', sans-serif; cursor: pointer; transition: 0.3s; text-transform: uppercase; }
+        .input-group { display: flex; gap: 15px; }
+        .input-group > div { flex: 1; }
+
+        .btn-submit { width: 100%; padding: 16px; background: #111111 !important; color: #ffffff !important; border: 2px solid #111111 !important; border-radius: 25px; font-size: 15px; font-weight: 900; font-family: 'Montserrat', sans-serif; cursor: pointer; transition: 0.3s; text-transform: uppercase; margin-top: 10px;}
         .btn-submit:hover { background: #333333 !important; }
         .back-link { display: inline-block; margin-bottom: 20px; color: var(--text-muted); text-decoration: none; font-weight: 700; transition: 0.3s; }
         .back-link:hover { color: var(--text-main); }
-        @media (max-width: 768px) { .checkout-container { grid-template-columns: 1fr; } }
+        .section-title { font-family: 'Montserrat', sans-serif; font-weight: 800; font-size: 16px; margin: 25px 0 15px 0; padding-bottom: 10px; border-bottom: 1px solid var(--border); color: var(--text-main); }
+        
+        @media (max-width: 768px) { .checkout-container { grid-template-columns: 1fr; } .input-group { flex-direction: column; gap: 0; } }
     </style>
 </head>
 <body>
@@ -113,7 +115,7 @@ $qr_url = "storage/my_qrcode.jpg";
         </div>
 
         <div class="box">
-            <h1>Payment</h1>
+            <h1>Payment & Shipping</h1>
             <div class="qr-box">
                 <img src="<?= htmlspecialchars($qr_url) ?>" alt="Store QR Code">
                 <div class="qr-text">SCAN TO PAY</div>
@@ -123,12 +125,40 @@ $qr_url = "storage/my_qrcode.jpg";
             <form action="checkout_process.php<?= isset($_GET['buy_now']) ? '?buy_now=1' : '' ?>" method="POST" enctype="multipart/form-data">
                 <input type="hidden" name="csrf_token" value="<?= e($_SESSION['csrf_token']) ?>">
                 
-                <label>Your Name</label>
-                <input type="text" name="customer_name" placeholder="ชื่อ-นามสกุล" required>
+                <div class="section-title">Customer Info</div>
+                <label>ชื่อ-นามสกุล (Full Name)</label>
+                <input type="text" name="customer_name" placeholder="ชื่อผู้รับสินค้า" required>
                 
-                <label>Contact Info (Email or Phone)</label>
-                <input type="text" name="contact_info" placeholder="อีเมล หรือ เบอร์โทรศัพท์" required>
+                <label>เบอร์โทรศัพท์ (Phone Number)</label>
+                <input type="text" name="contact_info" placeholder="08x-xxx-xxxx" required>
                 
+                <div class="section-title">Shipping Address</div>
+                <label>ที่อยู่ (Address)</label>
+                <input type="text" name="address" placeholder="บ้านเลขที่, หมู่, ซอย, ถนน, ตึก/หมู่บ้าน" required>
+                
+                <div class="input-group">
+                    <div>
+                        <label>ตำบล / แขวง (Sub-district)</label>
+                        <input type="text" name="sub_district" required>
+                    </div>
+                    <div>
+                        <label>อำเภอ / เขต (District)</label>
+                        <input type="text" name="district" required>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <div>
+                        <label>จังหวัด (Province)</label>
+                        <input type="text" name="province" required>
+                    </div>
+                    <div>
+                        <label>รหัสไปรษณีย์ (Zip Code)</label>
+                        <input type="text" name="zipcode" required>
+                    </div>
+                </div>
+                
+                <div class="section-title">Payment Proof</div>
                 <label>Upload Payment Slip (รูปสลิปโอนเงิน)</label>
                 <input type="file" name="slip_upload" accept="image/*" required>
                 
